@@ -1,6 +1,7 @@
 #referenced Wikipedia Ford Fulkerson Algorithm
 import argparse
 import networkflow 
+import xlsxwriter
 
 parser = argparse.ArgumentParser(description='Produces a matching for ANova members.')
 parser.add_argument('preferences', help="preferences input")
@@ -28,7 +29,22 @@ def main():
 		flow = school[1]
 		g.add_edge(name, "t", flow)
 
-	print(g.max_flow("s", "t", school_names))
+	matching = g.max_flow("s", "t", school_names)
+	write_workbook(matching)
+
+def write_workbook(matching):
+	workbook = xlsxwriter.Workbook('anova_matching.xlsx')
+	worksheet = workbook.add_worksheet()
+	row = 0
+	col = 0
+	for item in matching:
+		worksheet.write(row, col, item)
+		for person in matching[item]:
+			worksheet.write(row, col + 1, person)
+			col += 1
+		row += 1
+		col = 0
+	workbook.close()
 
 def parse_preferences(preferences):
 	people = []
@@ -43,7 +59,6 @@ def parse_schools(schools):
 	with open (schools, "r") as file:
 		for line in file:
 			school = line.strip("\n ").split(",")
-			print(school)
 			school[1] = int(school[1])
 			values.append(school)
 	return values

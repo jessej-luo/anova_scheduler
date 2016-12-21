@@ -50,13 +50,18 @@ class FlowNetwork(object):
 				self.flow[edge.redge] -= flow
 			path = self.find_path(source, sink, [])
 		#iterate over all schools and check for -1
+		matching = {}
 		for school in schools:
 			for edge in self.get_edges(school):
 				if self.flow[edge] == -1:
-					print(edge)
-
+					if edge.source not in matching:
+						matching[edge.source] = [edge.sink]
+					else:
+						matching[edge.source].append(edge.sink)
+					
 		max_flow = sum(self.flow[edge] for edge in self.get_edges(source))
 		if max_flow == len(self.get_edges(source)):
-			return "Max Matching Available"
+			print("Max Match found")
+			return matching
 		else:
 			return "No Max Matching Found"
